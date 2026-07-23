@@ -157,6 +157,12 @@ class YandexDialog(HomeAssistantView):
                     if state[k]:
                         event_data[k] = state[k]
 
+            # forward the launching speaker id (from the request, not state) so a
+            # downstream bridge can route the reply back to THAT station
+            app = (event.get("session") or {}).get("application") or {}
+            if app.get("application_id"):
+                event_data["application_id"] = app["application_id"]
+
             if intents := event["request"].get("nlu", {}).get("intents"):
                 event_data["intent"] = intent_type = next(iter(intents))
                 for k, v in intents[intent_type]["slots"].items():
